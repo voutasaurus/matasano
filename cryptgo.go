@@ -185,6 +185,16 @@ func repeatXorEncrypt(plain, secret string) (string, error) {
 	return hex.EncodeToString([]byte((encrypted))), nil
 }
 
+func rxeFile(fileRead, fileWrite string) error {
+	file, err := os.Open(fileRead)
+	if err != nil {
+		return errors.New(fmt.Sprint("opening:", fileRead, err))
+	}
+	defer file.Close()
+
+	return nil
+}
+
 // Exercise 5B: encrypt a bunch of stuff with repeating XOR
 
 func main() {
