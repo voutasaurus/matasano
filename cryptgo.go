@@ -169,6 +169,7 @@ type CrackByteXor struct{
 	// 	}
 	// 	fmt.Println(crypt)
 	// 	return
+// This is a dumb way to do this for large inputs...
 func repeatXorEncrypt(plain, secret string) (string, error) {
 	// create full length secret
 	fullSecret := ""
@@ -185,21 +186,27 @@ func repeatXorEncrypt(plain, secret string) (string, error) {
 	return hex.EncodeToString([]byte((encrypted))), nil
 }
 
-func rxeFile(fileRead, fileWrite string) error {
-	file, err := os.Open(fileRead)
-	if err != nil {
-		return errors.New(fmt.Sprint("opening:", fileRead, err))
-	}
-	defer file.Close()
-
-	return nil
-}
+// This is slightly smarter:
+//	bufferEncryptFileRXE(input, output, secret string) // See file_map.go
+//	bufferDecryptFileRXE(input, output, secret string) // See file_map.go
+// These functions encrypt in a buffer by looping on the secret instead of
+//	extending the secret to be the length of the message. This way the whole
+//	contents of the file doesn't have to be in memory at once, and using bufio
+//	the number of OS calls to read/write is minimised
 
 // Exercise 5B: encrypt a bunch of stuff with repeating XOR
 
 func main() {
-	fmt.Println("Result:")
-
+  fmt.Println("Result:")
+  rotating := 0
+  for i := 0; i < 10000; i++ {
+    fmt.Print(rotating, ", ")
+    if rotating == 14 {
+      fmt.Println()
+    }
+    rotating = incrementMod(rotating,15)
+  }
+  fmt.Println()
 }
 
 

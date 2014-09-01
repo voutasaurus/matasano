@@ -4,9 +4,33 @@ import (
   "os"
   "bufio"
   "io"
+  "math"
 )
 
-func bufferFiles(input, output string) {
+/*
+  fmt.Println("Result:")
+  rotating := 0
+  for i := 0; i < 10000; i++ {
+    fmt.Print(rotating, ", ")
+    if rotating == 14 {
+      fmt.Println()
+    }
+    rotating = incrementMod(rotating,15)
+  }
+  fmt.Println()
+*/
+func incrementMod(index, modulus int) int {
+  index++
+  return int(math.Mod(float64(index), float64(modulus)))
+}
+
+func bufferDecryptFileRXE(input, output, secret string) {
+  bufferEncryptFileRXE(input, output, secret) // encryption and decryption are the same
+}
+
+// probably split this into a file function and a bufio readr/writer function
+// it's a bit long
+func bufferEncryptFileRXE(input, output, secret string) {
   // open input file
   fi, err := os.Open(input)
   if err != nil {
@@ -39,6 +63,9 @@ func bufferFiles(input, output string) {
   // make a write buffer
   w := bufio.NewWriter(fo)
 
+  secretIndex := 0
+  secretBuf := []byte(secret)
+
   // make a buffer to keep chunks that are read
   buf := make([]byte, 1024)
   for {
@@ -49,6 +76,11 @@ func bufferFiles(input, output string) {
     }
     if n == 0 {
       break
+    }
+
+    for i := range buf[:n] {
+      buf[i] ^= secretBuf[secretIndex] // xor is both to encrypt AND decrypt
+      secretIndex = incrementMod(secretIndex, len(secret))
     }
 
     // write a chunk
